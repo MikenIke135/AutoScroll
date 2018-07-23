@@ -66,3 +66,6 @@ hr{
     background-color: #cc0000;
     border-color: #cc0000;
 }
+.hidden-div {
+    padding-top: 10px;
+}

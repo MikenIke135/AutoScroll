@@ -1,6 +1,3 @@
-var refresh;
-
-
 $(document).ready( function () {
 
   document.documentElement.scrollTop = 0; // scroll to top to start
@@ -23,11 +20,46 @@ $(document).ready( function () {
     refreshRate = result.refreshRate * 1000;
     if (refreshRate !== 0) {
 
-      refresh = setTimeout(() => {
+      setTimeout(() => {
         window.location.reload();
       }, refreshRate);
     }
   });
+
+  chrome.storage.sync.get(['switchRate'], function(result) {
+
+    chrome.tabs.onActivated.addListener(() => {
+      setTimeout(() => {
+        
+        nextTab();
+      }, carouselRate);
+      });
+  });
+
+  function nextTab() {
+
+    chrome.tabs.query({active: true}, (tabs) => {
+      if (tabs.length) {
+
+        var activeTab = tabs[0], tabId = activeTab.id, currentIndex = activeTab.index;
+        chrome.tabs.query({currentWindow: true}, (tabs) => {
+
+          var numTabs = tabs.length;
+          chrome.tabs.query({index: (currentIndex + 1) % numTabs}, function (tabs) {
+
+            if (tabs.length) {
+
+              var tabToActivate = tabs[0], tabToActivate_Id = tabToActivate.id;
+              chrome.tabs.update(tabToActivate_Id, {
+
+                active: true
+              });
+            }
+          });
+        });
+      }
+    });
+  }
 
   function scroll(scrollRate) {
     $('html, body').animate({
